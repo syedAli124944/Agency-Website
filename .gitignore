@@ -3,6 +3,9 @@ node_modules/
 .pnp
 .pnp.js
 
+# Jetro / AI tooling (may contain credentials)
+.jetro/
+
 # Build output
 dist/
 dist-ssr/
