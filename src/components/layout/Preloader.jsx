@@ -12,7 +12,7 @@ export default function Preloader({ onComplete }) {
     const obj = { val: 0 };
     gsap.to(obj, {
       val: 100,
-      duration: 2.2,
+      duration: 3.2,
       ease: 'power2.inOut',
       onUpdate: () => setProgress(Math.round(obj.val)),
       onComplete: () => {

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar, Clock, CheckCircle, ArrowLeft, User, Mail, MessageSquare, Sparkles } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -146,20 +147,70 @@ function FloatInput({ label, icon:Icon, name, type='text', value, onChange, rows
 
 const steps = ['Pick Date & Time', 'Your Details', 'Confirmed!'];
 
-export default function BookingPage({ onBack }) {
+export default function BookingPage({ user, onBack, onAuthOpen }) {
   const [step, setStep] = useState(0);
   const [duration, setDuration] = useState('30min');
   const [date, setDate] = useState(null);
   const [time, setTime] = useState('');
-  const [form, setForm] = useState({ name:'', email:'', note:'' });
+  const [form, setForm] = useState({ 
+    name: user?.user_metadata?.full_name || '', 
+    email: user?.email || '', 
+    note: '' 
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Update form if user data arrives late
+  useEffect(() => {
+    if (user) {
+      setForm(prev => ({
+        ...prev,
+        name: prev.name || user?.user_metadata?.full_name || '',
+        email: prev.email || user?.email || '',
+      }));
+    }
+  }, [user]);
 
   const upd = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
 
   const canNext = step === 0 ? (date && time) : (form.name && form.email);
 
-  const handleConfirm = (e) => {
+  const handleConfirm = async (e) => {
     e.preventDefault();
-    setStep(2);
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    try {
+      if (!user) throw new Error('Please sign in to book a session.');
+
+      // Combine Date + Time string into a proper Date object for 'start_time'
+      const combinedDate = new Date(date);
+      const [h, m_part] = time.split(':');
+      const [m, period] = m_part.split(' ');
+      let hours = parseInt(h);
+      if (period === 'PM' && hours < 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+      combinedDate.setHours(hours, parseInt(m), 0, 0);
+
+      // Insert into Supabase - Matching your SQL Columns
+      const { error } = await supabase
+        .from('bookings')
+        .insert([{
+          user_id: user.id,
+          start_time: combinedDate.toISOString(),
+          duration: duration === '30min' ? 30 : 60,
+          notes: form.note,
+          status: 'pending'
+        }]);
+
+      if (error) throw error;
+      setStep(2);
+    } catch (err) {
+      setErrorMessage(err.message || 'Something went wrong.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -291,27 +342,36 @@ export default function BookingPage({ onBack }) {
                     <FloatInput label="Email Address" icon={Mail} name="email" type="email" value={form.email} onChange={upd('email')} />
                     <FloatInput label="What would you like to discuss? (optional)" icon={MessageSquare} name="note" value={form.note} onChange={upd('note')} rows={3} />
 
-                    {/* Booking summary */}
-                    <div className="rounded-xl bg-white/[0.03] border border-white/8 p-4 space-y-2">
-                      {[
-                        { icon: Calendar, val: date?.toLocaleDateString('en-US',{ weekday:'long', month:'long', day:'numeric' }) },
-                        { icon: Clock,    val: `${time} · ${duration === '30min' ? '30 minutes' : '1 hour'}` },
-                      ].map(({ icon:Icon, val }) => (
-                        <div key={val} className="flex items-center gap-3 text-sm text-white/70">
-                          <Icon size={14} className="text-accent-cyan flex-shrink-0" /> {val}
-                        </div>
-                      ))}
-                    </div>
+                    {errorMessage && (
+                      <div className="rounded-xl bg-accent-pink/10 border border-accent-pink/25 px-4 py-3 text-xs text-accent-pink text-center flex flex-col items-center gap-2">
+                        <span>{errorMessage}</span>
+                        {errorMessage.toLowerCase().includes('sign in') && (
+                          <button 
+                            type="button" 
+                            onClick={onAuthOpen}
+                            className="text-accent-cyan font-bold hover:underline"
+                          >
+                            Sign In Now →
+                          </button>
+                        )}
+                      </div>
+                    )}
 
                     <div className="flex gap-3 pt-1">
                       <button type="button" onClick={() => setStep(0)}
                         className="flex-1 py-3 rounded-xl text-sm font-semibold glass border border-white/10 text-white/60 hover:text-white transition-colors">
                         ← Back
                       </button>
-                      <motion.button type="submit" disabled={!canNext} whileHover={canNext?{scale:1.02}:{}} whileTap={canNext?{scale:0.97}:{}}
+                      <motion.button type="submit" disabled={!canNext || isSubmitting} whileHover={canNext && !isSubmitting ? { scale:1.02 } : {}} whileTap={canNext && !isSubmitting ? { scale:0.97 } : {}}
                         className="flex-2 flex-grow py-3 rounded-xl text-sm font-bold text-primary-900 disabled:opacity-40 shadow-[0_0_14px_rgba(0,245,255,0.35)]"
                         style={{ background:'linear-gradient(135deg,#00F5FF,#7C3AED)' }}>
-                        Confirm Booking
+                        {isSubmitting ? (
+                          <span className="flex items-center justify-center gap-2">
+                            Booking... <div className="w-4 h-4 border-2 border-primary-900/30 border-t-primary-900 rounded-full animate-spin" />
+                          </span>
+                        ) : (
+                          'Confirm Booking'
+                        )}
                       </motion.button>
                     </div>
                   </form>

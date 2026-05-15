@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/lib/supabase';
 import SmoothScroll from '@/components/layout/SmoothScroll';
 import Preloader from '@/components/layout/Preloader';
 import CustomCursor from '@/components/effects/CustomCursor';
@@ -24,6 +25,8 @@ import PortfolioPage from '@/pages/PortfolioPage';
 import AuthPage from '@/pages/AuthPage';
 import BookingPage from '@/pages/BookingPage';
 import BlogPostPage from '@/pages/BlogPostPage';
+import SuccessPage from '@/pages/SuccessPage';
+import AdminDashboard from '@/pages/AdminDashboard';
 
 const pageVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -37,6 +40,41 @@ export default function App() {
   const [showAuth, setShowAuth]           = useState(false);
   const [showBooking, setShowBooking]     = useState(false);
   const [currentPost, setCurrentPost]     = useState(null);
+  const [user, setUser]                   = useState(null);
+  const [showSuccess, setShowSuccess]     = useState(false);
+  const [showAdmin, setShowAdmin]         = useState(false);
+
+  useEffect(() => {
+    // Check for success URL from Stripe
+    if (window.location.pathname === '/success') {
+      setShowSuccess(true);
+      // Clean up the URL
+      window.history.replaceState({}, '', '/');
+    }
+    // 1. Check initial session and URL
+    const checkInitialState = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const u = session?.user ?? null;
+      setUser(u);
+    };
+    
+    checkInitialState();
+
+    // 2. Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      const u = session?.user ?? null;
+      setUser(u);
+
+      if (event === 'SIGNED_IN') {
+        setShowAuth(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const handleLoaded = useCallback(() => setLoaded(true), []);
 
   const handleViewAll = useCallback(() => {
@@ -63,13 +101,21 @@ export default function App() {
       {/* Auth overlay — above everything */}
       <AnimatePresence>
         {showAuth && <AuthPage key="auth" onClose={() => setShowAuth(false)} />}
+        {showAdmin && <AdminDashboard key="admin" onBack={() => setShowAdmin(false)} />}
       </AnimatePresence>
 
       {loaded && (
         <AnimatePresence mode="wait">
           {showBooking ? (
             <motion.div key="booking-page" variants={pageVariants} initial="hidden" animate="visible" exit="exit">
-              <BookingPage onBack={() => setShowBooking(false)} />
+              <BookingPage 
+                user={user} 
+                onBack={() => setShowBooking(false)} 
+                onAuthOpen={() => {
+                  setShowBooking(false);
+                  setShowAuth(true);
+                }} 
+              />
             </motion.div>
           ) : currentPost ? (
             <motion.div key={`post-${currentPost.id}`} variants={pageVariants} initial="hidden" animate="visible" exit="exit">
@@ -77,6 +123,10 @@ export default function App() {
                 post={currentPost}
                 onBack={() => setCurrentPost(null)}
                 onNavigate={(p) => setCurrentPost(p)}
+                onBookingOpen={() => {
+                  setCurrentPost(null);
+                  setShowBooking(true);
+                }}
               />
             </motion.div>
           ) : showPortfolio ? (
@@ -85,10 +135,23 @@ export default function App() {
             </motion.div>
           ) : (
             <motion.div key="home" variants={pageVariants} initial="hidden" animate="visible" exit="exit">
+              {showSuccess && (
+                <div className="fixed inset-0 z-[1000]">
+                  <SuccessPage onBack={() => setShowSuccess(false)} />
+                </div>
+              )}
               <SmoothScroll>
                 <ScrollProgress />
                 <ParticleField />
-                <Navbar onAuthOpen={() => setShowAuth(true)} />
+                <Navbar 
+                  user={user} 
+                  onAuthOpen={() => setShowAuth(true)} 
+                  onAdminOpen={() => setShowAdmin(true)}
+                  onLogout={async () => {
+                    await supabase.auth.signOut();
+                    setShowAuth(true);
+                  }}
+                />
                 <main>
                   <Hero onBooking={() => setShowBooking(true)} />
                   <TrustedBrands />
@@ -99,7 +162,11 @@ export default function App() {
                   <Testimonials />
                   <Team />
                   <Pricing />
-                  <Blog onPostClick={(p) => setCurrentPost(p)} />
+                  <Blog onPostClick={(p) => {
+                    if (window.__lenis) window.__lenis.scrollTo(0, { immediate: true });
+                    window.scrollTo(0, 0);
+                    setCurrentPost(p);
+                  }} />
                   <FAQ />
                   <Contact />
                 </main>

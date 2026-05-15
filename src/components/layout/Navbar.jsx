@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
-import { Menu, X, ArrowRight, Zap } from 'lucide-react';
+import { Menu, X, ArrowRight, Zap, BarChart3 } from 'lucide-react';
 import { navLinks } from '@/data/siteData';
 
 // ── Smooth scroll via Lenis ───────────────────────────────────────────────────
@@ -116,7 +116,7 @@ function NavSpotlight({ navRef }) {
   );
 }
 
-export default function Navbar({ onAuthOpen }) {
+export default function Navbar({ user, onAuthOpen, onAdminOpen, onLogout }) {
   const [scrolled,   setScrolled]   = useState(false);
   const [scrollPct,  setScrollPct]  = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -278,10 +278,23 @@ export default function Navbar({ onAuthOpen }) {
 
             {/* ── Right side: CTA + hamburger ── */}
             <div className="flex items-center gap-3">
-              {/* Desktop CTA — premium pill */}
+              {/* Admin Access — Only for owner */}
+              {user?.email === 'aliabbas.as777@gmail.com' && (
+                <motion.button
+                  onClick={onAdminOpen}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  whileHover={{ scale: 1.05 }}
+                  className="hidden lg:flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-accent-cyan/10 border border-accent-cyan/20 text-accent-cyan hover:bg-accent-cyan/20 transition-all"
+                >
+                  <BarChart3 size={14} /> Admin
+                </motion.button>
+              )}
+
+              {/* Desktop Auth — premium pill */}
               <motion.button
                 type="button"
-                onClick={onAuthOpen}
+                onClick={user ? onLogout : onAuthOpen}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 3.1, type: 'spring', stiffness: 300, damping: 22 }}
@@ -289,19 +302,22 @@ export default function Navbar({ onAuthOpen }) {
                 whileTap={{ scale: 0.97 }}
                 className="hidden lg:flex items-center gap-2 relative overflow-hidden px-5 py-2.5 text-sm font-bold rounded-full text-primary-900"
                 style={{
-                  background: 'linear-gradient(135deg, #00F5FF, #7C3AED)',
-                  boxShadow: '0 0 20px rgba(0,245,255,0.25), 0 4px 16px rgba(0,0,0,0.3)',
+                  background: user ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #00F5FF, #7C3AED)',
+                  color: user ? '#fff' : '#0B1020',
+                  border: user ? '1px solid rgba(255,255,255,0.2)' : 'none',
+                  boxShadow: user ? 'none' : '0 0 20px rgba(0,245,255,0.25), 0 4px 16px rgba(0,0,0,0.3)',
                 }}
                 data-cursor-hover
               >
-                {/* Shimmer sweep */}
-                <motion.span
-                  animate={{ x: ['-100%', '200%'] }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 1.5 }}
-                  className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 pointer-events-none"
-                />
+                {!user && (
+                  <motion.span
+                    animate={{ x: ['-100%', '200%'] }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 1.5 }}
+                    className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 pointer-events-none"
+                  />
+                )}
                 <span className="relative z-10 flex items-center gap-1.5">
-                  Get Started <ArrowRight size={13} />
+                  {user ? 'Sign Out' : 'Get Started'} <ArrowRight size={13} />
                 </span>
               </motion.button>
 
@@ -436,20 +452,36 @@ export default function Navbar({ onAuthOpen }) {
               <div className="px-4 py-5" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
                 <motion.button
                   type="button"
-                  onClick={() => { setMobileOpen(false); onAuthOpen?.(); }}
+                  onClick={() => { setMobileOpen(false); user ? onLogout?.() : onAuthOpen?.(); }}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.38 }}
                   whileTap={{ scale: 0.97 }}
                   className="relative overflow-hidden flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold text-primary-900"
-                  style={{ background: 'linear-gradient(135deg,#00F5FF,#7C3AED)', boxShadow: '0 0 20px rgba(0,245,255,0.2)' }}
+                  style={{ 
+                    background: user ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg,#00F5FF,#7C3AED)', 
+                    color: user ? '#fff' : '#0B1020',
+                    border: user ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                    boxShadow: user ? 'none' : '0 0 20px rgba(0,245,255,0.2)' 
+                  }}
                 >
-                  <motion.span
-                    animate={{ x: ['-100%', '200%'] }}
-                    transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 2 }}
-                    className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none"
-                  />
-                  <span className="relative z-10 flex items-center gap-1.5">Get Started <ArrowRight size={13} /></span>
+                  {!user && (
+                    <motion.span
+                      animate={{ x: ['-100%', '200%'] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 2 }}
+                      className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none"
+                    />
+                  )}
+                  {/* Mobile Admin Link */}
+                  {user?.email === 'aliabbas.as777@gmail.com' && (
+                    <motion.button
+                      onClick={() => { setMobileOpen(false); onAdminOpen(); }}
+                      className="w-full py-3 mb-2 rounded-xl text-sm font-bold bg-accent-cyan/10 border border-accent-cyan/20 text-accent-cyan"
+                    >
+                      Agency Dashboard
+                    </motion.button>
+                  )}
+                  <span className="relative z-10 flex items-center gap-1.5">{user ? 'Sign Out' : 'Get Started'} <ArrowRight size={13} /></span>
                 </motion.button>
               </div>
             </motion.aside>

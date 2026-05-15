@@ -7,6 +7,7 @@ import {
 import SectionHeading from '@/components/common/SectionHeading';
 import MagneticButton from '@/components/common/MagneticButton';
 import { fadeUp, staggerContainer } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
 
 // ── Google Maps embed (dark-filtered, inline, fully interactive) ─────────────
 const MAP_SRC =
@@ -234,16 +235,35 @@ export default function Contact() {
   const [focused, setFocused] = useState('');
   const [sent, setSent]       = useState(false);
   const [sentData, setSentData] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const upd = (k, v) => setForm((prev) => ({ ...prev, [k]: v }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Save a snapshot of what was submitted
-    setSentData({ ...form });
-    setSent(true);
-    setForm({ name: '', email: '', message: '' });
-    setFocused('');
+    setIsSubmitting(true);
+    
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert([{
+          name: form.name,
+          email: form.email,
+          message: form.message
+        }]);
+
+      if (error) throw error;
+
+      setSentData({ ...form });
+      setSent(true);
+      setForm({ name: '', email: '', message: '' });
+      setFocused('');
+    } catch (error) {
+      console.error('Error sending message:', error.message);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -298,8 +318,20 @@ export default function Contact() {
                     />
                   </div>
                   <div className="mt-6">
-                    <MagneticButton variant="primary" className="w-full justify-center">
-                      Send Message <Send size={16} />
+                    <MagneticButton 
+                      variant="primary" 
+                      className="w-full justify-center"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <span className="flex items-center gap-2">
+                          Sending... <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          Send Message <Send size={16} />
+                        </span>
+                      )}
                     </MagneticButton>
                   </div>
                 </motion.form>

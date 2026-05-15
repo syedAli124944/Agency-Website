@@ -4,15 +4,13 @@ export default function CustomCursor() {
   const cursorRef = useRef(null);
   const trailRef = useRef(null);
   const [hovering, setHovering] = useState(false);
-  const [hidden, setHidden] = useState(false);
+  const [hasMoved, setHasMoved] = useState(false);
   const pos = useRef({ x: 0, y: 0 });
   const trailPos = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    // Hide on touch devices
-    if ('ontouchstart' in window) { setHidden(true); return; }
-
     const move = (e) => {
+      if (!hasMoved) setHasMoved(true);
       pos.current = { x: e.clientX, y: e.clientY };
     };
 
@@ -55,16 +53,16 @@ export default function CustomCursor() {
       observer.disconnect();
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [hasMoved]);
 
-  if (hidden) return null;
+  if (!hasMoved) return null;
 
   return (
     <>
       {/* Main cursor dot */}
       <div
         ref={cursorRef}
-        className="fixed top-0 left-0 z-[9999] pointer-events-none mix-blend-difference"
+        className="fixed top-0 left-0 z-[99999] pointer-events-none mix-blend-difference"
         style={{ willChange: 'transform' }}
       >
         <div
@@ -76,7 +74,7 @@ export default function CustomCursor() {
       {/* Trail ring */}
       <div
         ref={trailRef}
-        className="fixed top-0 left-0 z-[9998] pointer-events-none"
+        className="fixed top-0 left-0 z-[99998] pointer-events-none"
         style={{ willChange: 'transform' }}
       >
         <div

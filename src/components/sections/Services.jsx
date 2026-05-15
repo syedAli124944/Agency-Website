@@ -1,8 +1,14 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import SectionHeading from '@/components/common/SectionHeading';
-import { services } from '@/data/siteData';
+import { Globe, Smartphone, Palette, TrendingUp, Search, Cloud, Code2, Rocket, Zap } from 'lucide-react';
 import { fadeUp, staggerContainer } from '@/lib/utils';
+
+// Helper to map icon names from DB to Lucide components
+const IconMap = {
+  Globe, Smartphone, Palette, TrendingUp, Search, Cloud, Code2, Rocket, Zap
+};
 
 function ServiceCard({ service, index }) {
   const ref = useRef(null);
@@ -19,7 +25,7 @@ function ServiceCard({ service, index }) {
   };
   const reset = () => { x.set(0); y.set(0); };
 
-  const Icon = service.icon;
+  const Icon = IconMap[service.icon_name] || Zap;
 
   return (
     <motion.div
@@ -61,6 +67,22 @@ function ServiceCard({ service, index }) {
 }
 
 export default function Services() {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    async function fetchServices() {
+      const { data: dbData, error } = await supabase
+        .from('services')
+        .select('*')
+        .order('created_at', { ascending: true });
+      
+      if (!error && dbData) {
+        setData(dbData);
+      }
+    }
+    fetchServices();
+  }, []);
+
   return (
     <section id="services" className="section-padding relative overflow-hidden">
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent-pink/5 rounded-full blur-[150px]" />
@@ -79,8 +101,8 @@ export default function Services() {
           viewport={{ once: true, margin: '-50px' }}
           className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {services.map((service, i) => (
-            <ServiceCard key={service.title} service={service} index={i} />
+          {data.map((service, i) => (
+            <ServiceCard key={service.id || i} service={service} index={i} />
           ))}
         </motion.div>
       </div>

@@ -62,7 +62,7 @@ function ProjectCard({ project, onClick, index }) {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={hovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.8 }}
           className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-gradient-to-t from-primary-900/95 to-transparent flex justify-between items-end"
         >
           {project.stats.map((s) => (
@@ -75,7 +75,7 @@ function ProjectCard({ project, onClick, index }) {
 
         {/* View detail button */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.7 }}
+          initial={{ opacity: 0, scale: 0.3 }}
           animate={hovered ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.7 }}
           transition={{ duration: 0.25 }}
           className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20"
