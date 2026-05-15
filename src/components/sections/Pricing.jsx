@@ -159,11 +159,14 @@ export default function Pricing({ onCheckout }) {
                 </MagneticButton>
 
                 <button 
-                  onClick={() => openBankTransfer(plan)}
-                  className="w-full py-3.5 px-6 rounded-2xl border border-white/10 bg-white/5 text-white/70 text-xs font-bold hover:bg-white/10 hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2 group"
+                  onClick={() => {
+                    console.log('Bank Transfer Clicked for:', plan.name);
+                    openBankTransfer(plan);
+                  }}
+                  className="w-full py-4 px-6 rounded-2xl bg-[#00F5FF] text-[#000000] text-xs font-black uppercase tracking-widest hover:bg-white transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,245,255,0.3)]"
                 >
-                  <Landmark size={14} className="text-accent-cyan group-hover:scale-110 transition-transform" /> 
-                  <span>Pay via Bank Transfer</span>
+                  <Landmark size={14} className="text-[#000000]" /> 
+                  <span>PAY VIA BANK TRANSFER</span>
                 </button>
               </div>
             </motion.div>

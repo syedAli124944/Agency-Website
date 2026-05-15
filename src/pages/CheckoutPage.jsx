@@ -179,9 +179,18 @@ export default function CheckoutPage({ plan, interval, onBack }) {
 
                 <button 
                   onClick={() => window.print()}
-                  className="w-full py-4 rounded-2xl bg-white text-primary-950 font-black uppercase tracking-widest text-sm hover:bg-accent-cyan transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(0,245,255,0.3)]"
+                  style={{ backgroundColor: '#00F5FF', color: '#000000', fontWeight: '900' }}
+                  className="w-full py-5 rounded-2xl uppercase tracking-[0.2em] text-sm hover:brightness-110 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_30px_rgba(0,245,255,0.4)]"
                 >
                   Print Payment Instructions
+                </button>
+
+                <button 
+                  onClick={onBack}
+                  style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}
+                  className="w-full py-4 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors"
+                >
+                  Return to Pricing
                 </button>
               </div>
             </div>
