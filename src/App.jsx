@@ -104,14 +104,6 @@ export default function App() {
       <AnimatePresence>
         {showAuth && <AuthPage key="auth" onClose={() => setShowAuth(false)} />}
         {showAdmin && <AdminDashboard key="admin" onBack={() => setShowAdmin(false)} />}
-        {checkoutData && (
-          <CheckoutPage 
-            key="checkout"
-            plan={checkoutData.plan} 
-            interval={checkoutData.interval} 
-            onBack={() => setCheckoutData(null)} 
-          />
-        )}
       </AnimatePresence>
 
       {loaded && (
@@ -189,6 +181,17 @@ export default function App() {
           )}
         </AnimatePresence>
       )}
+      <AnimatePresence>
+        {checkoutData && (
+          <div className="fixed inset-0 z-[10000]">
+            <CheckoutPage 
+              plan={checkoutData.plan} 
+              interval={checkoutData.interval} 
+              onBack={() => setCheckoutData(null)} 
+            />
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

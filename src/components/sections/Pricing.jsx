@@ -160,10 +160,11 @@ export default function Pricing({ onCheckout }) {
 
                 <button 
                   onClick={() => {
-                    console.log('Bank Transfer Clicked for:', plan.name);
+                    console.log('DEBUG: Bank Transfer Clicked');
+                    window.alert("Bank Transfer Initiated - Opening Secure Portal...");
                     openBankTransfer(plan);
                   }}
-                  className="w-full py-4 px-6 rounded-2xl bg-[#00F5FF] text-[#000000] text-xs font-black uppercase tracking-widest hover:bg-white transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,245,255,0.3)]"
+                  className="relative z-[999] w-full py-4 px-6 rounded-2xl bg-[#00F5FF] text-[#000000] text-xs font-black uppercase tracking-widest hover:bg-white transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,245,255,0.4)]"
                 >
                   <Landmark size={14} className="text-[#000000]" /> 
                   <span>PAY VIA BANK TRANSFER</span>
