@@ -1,15 +1,8 @@
-import { useRef, useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import SectionHeading from '@/components/common/SectionHeading';
-import { Globe, Smartphone, Palette, TrendingUp, Search, Cloud, Code2, Rocket, Zap } from 'lucide-react';
 import { fadeUp, staggerContainer } from '@/lib/utils';
-import { services as fallbackServices } from '@/data/siteData';
-
-// Helper to map icon names from DB to Lucide components
-const IconMap = {
-  Globe, Smartphone, Palette, TrendingUp, Search, Cloud, Code2, Rocket, Zap
-};
+import { services } from '@/data/siteData';
 
 function ServiceCard({ service, index }) {
   const ref = useRef(null);
@@ -26,7 +19,7 @@ function ServiceCard({ service, index }) {
   };
   const reset = () => { x.set(0); y.set(0); };
 
-  const Icon = IconMap[service.icon_name] || Zap;
+  const Icon = service.icon;
 
   return (
     <motion.div
@@ -68,36 +61,6 @@ function ServiceCard({ service, index }) {
 }
 
 export default function Services() {
-  const [data, setData] = useState([]);
-
-  // Normalize fallback data to match component expectations
-  // We use the icon object name directly from siteData as icon_name
-  const normalizedFallback = fallbackServices.map((s, i) => ({
-    ...s,
-    id: `fallback-${i}`,
-    icon_name: s.icon?.displayName || s.icon?.name || s.title.split(' ').join('') 
-  }));
-
-  useEffect(() => {
-    async function fetchServices() {
-      try {
-        const { data: dbData, error } = await supabase
-          .from('services')
-          .select('*')
-          .order('created_at', { ascending: true });
-        
-        if (error || !dbData || dbData.length === 0) {
-          setData(normalizedFallback);
-        } else {
-          setData(dbData);
-        }
-      } catch (err) {
-        setData(normalizedFallback);
-      }
-    }
-    fetchServices();
-  }, []);
-
   return (
     <section id="services" className="section-padding relative overflow-hidden">
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent-pink/5 rounded-full blur-[150px]" />
@@ -116,8 +79,8 @@ export default function Services() {
           viewport={{ once: true, margin: '-50px' }}
           className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {data.map((service, i) => (
-            <ServiceCard key={service.id || i} service={service} index={i} />
+          {services.map((service, i) => (
+            <ServiceCard key={i} service={service} index={i} />
           ))}
         </motion.div>
       </div>
