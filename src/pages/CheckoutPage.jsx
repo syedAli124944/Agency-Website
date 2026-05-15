@@ -21,6 +21,12 @@ export default function CheckoutPage({ plan, interval, onBack }) {
   const [step, setStep] = useState(1);
   const [txId] = useState(`TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`);
 
+  // Lock background scroll
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, []);
+
   const amount = interval === 'yearly' ? plan.price.yearly : plan.price.monthly;
 
   const copyToClipboard = (text, field) => {
@@ -30,7 +36,10 @@ export default function CheckoutPage({ plan, interval, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1020] text-white font-sans selection:bg-accent-cyan/30">
+    <div 
+      data-lenis-prevent
+      className="fixed inset-0 z-[10000] overflow-y-auto bg-[#0B1020] text-white font-sans selection:bg-accent-cyan/30"
+    >
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[150px]" />

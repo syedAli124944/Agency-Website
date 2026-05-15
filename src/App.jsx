@@ -183,13 +183,11 @@ export default function App() {
       )}
       <AnimatePresence>
         {checkoutData && (
-          <div className="fixed inset-0 z-[10000]">
-            <CheckoutPage 
-              plan={checkoutData.plan} 
-              interval={checkoutData.interval} 
-              onBack={() => setCheckoutData(null)} 
-            />
-          </div>
+          <CheckoutPage 
+            plan={checkoutData.plan} 
+            interval={checkoutData.interval} 
+            onBack={() => setCheckoutData(null)} 
+          />
         )}
       </AnimatePresence>
     </div>
