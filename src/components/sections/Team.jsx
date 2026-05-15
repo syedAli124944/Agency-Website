@@ -1,58 +1,14 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Linkedin, Twitter, Github } from 'lucide-react';
 import SectionHeading from '@/components/common/SectionHeading';
 import { fadeUp, staggerContainer } from '@/lib/utils';
-import { team as fallbackTeam } from '@/data/siteData';
+import { team as teamData } from '@/data/siteData';
 
 const socialConfig = [
   { key: 'twitter',  Icon: Twitter,  label: 'Twitter',  hoverColor: '#1DA1F2' },
   { key: 'linkedin', Icon: Linkedin, label: 'LinkedIn', hoverColor: '#0A66C2' },
   { key: 'github',   Icon: Github,   label: 'GitHub',   hoverColor: '#e2e8f0' },
-];
-
-const DEFAULT_TEAM = [
-  {
-    id: 'd1',
-    name: 'Syed Ali',
-    role: 'Full Stack Developer',
-    image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-    color: '#00F5FF',
-    twitter_url: '#',
-    linkedin_url: '#',
-    github_url: '#'
-  },
-  {
-    id: 'd2',
-    name: 'Sarah Jenkins',
-    role: 'UI/UX Lead',
-    image_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
-    color: '#7C3AED',
-    twitter_url: '#',
-    linkedin_url: '#',
-    github_url: '#'
-  },
-  {
-    id: 'd3',
-    name: 'Marcus Thorne',
-    role: 'Creative Director',
-    image_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
-    color: '#FF4D9D',
-    twitter_url: '#',
-    linkedin_url: '#',
-    github_url: '#'
-  },
-  {
-    id: 'd4',
-    name: 'Elena Vance',
-    role: 'Brand Strategist',
-    image_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-    color: '#FF8A00',
-    twitter_url: '#',
-    linkedin_url: '#',
-    github_url: '#'
-  }
 ];
 
 function TeamCard({ member, i }) {
@@ -73,7 +29,7 @@ function TeamCard({ member, i }) {
     >
       <div className="relative h-52 overflow-hidden bg-primary-800 select-none">
         <img
-          src={member.image_url}
+          src={member.image}
           alt={member.name}
           className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
         />
@@ -82,7 +38,7 @@ function TeamCard({ member, i }) {
         <div className={`absolute bottom-0 left-0 right-0 flex justify-center gap-2.5 py-3 transition-transform duration-300 ease-out ${overlayClass}`}>
           <div className="absolute inset-0 bg-primary-900/60 backdrop-blur-sm" />
           {socialConfig.map(({ key, Icon, label, hoverColor }) => {
-            const url = member[`${key}_url`];
+            const url = member.social?.[key];
             return (
               <motion.a
                 key={key}
@@ -112,39 +68,6 @@ function TeamCard({ member, i }) {
 }
 
 export default function Team() {
-  const [data, setData] = useState(DEFAULT_TEAM);
-
-  // Normalize fallback data to match component expectations
-  const normalizedFallback = fallbackTeam.map((m, i) => ({
-    id: `fallback-${i}`,
-    name: m.name,
-    role: m.role,
-    image_url: m.image, // Map 'image' from siteData to 'image_url'
-    color: m.color,
-    twitter_url: m.social?.twitter || '#',
-    linkedin_url: m.social?.linkedin || '#',
-    github_url: m.social?.github || '#'
-  }));
-
-  useEffect(() => {
-    async function fetchTeam() {
-      try {
-        const { data: dbData, error } = await supabase
-          .from('team_members')
-          .select('*')
-          .order('created_at', { ascending: true });
-        
-        if (error || !dbData || dbData.length === 0) {
-          setData(normalizedFallback);
-        } else {
-          setData(dbData);
-        }
-      } catch (err) {
-        setData(normalizedFallback);
-      }
-    }
-    fetchTeam();
-  }, []);
   return (
     <section id="team" className="section-padding relative overflow-hidden">
       <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-accent-green/5 rounded-full blur-[150px]" />
@@ -163,8 +86,8 @@ export default function Team() {
           viewport={{ once: true, margin: '-20px' }}
           className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {data.map((member, i) => (
-            <TeamCard key={member.id || i} member={member} i={i} />
+          {teamData.map((member, i) => (
+            <TeamCard key={i} member={member} i={i} />
           ))}
         </motion.div>
       </div>
