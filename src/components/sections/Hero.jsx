@@ -169,6 +169,15 @@ export default function Hero({ onBooking }) {
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full grid lg:grid-cols-2 gap-12 lg:gap-8 items-center py-10 lg:py-0">
           {/* Left: Content */}
           <div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.6, duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass border border-white/10 mb-8 hover:border-accent-cyan/30 transition-colors group cursor-pointer"
+            >
+              <span className="px-2 py-0.5 rounded-full bg-accent-cyan text-[10px] font-black text-primary-900 uppercase">New</span>
+              <span className="text-[11px] font-bold text-white/70 uppercase tracking-widest group-hover:text-accent-cyan transition-colors">Latest Insight: The Future of AI Agency</span>
+            </motion.div>
             <div ref={headingRef} className="overflow-hidden">
               <h1 className="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight">
                 <span className="hero-line block">We Craft</span>
