@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Linkedin, Twitter, Github } from 'lucide-react';
 import SectionHeading from '@/components/common/SectionHeading';
 import { fadeUp, staggerContainer } from '@/lib/utils';
+import { team as fallbackTeam } from '@/data/siteData';
 
 const socialConfig = [
   { key: 'twitter',  Icon: Twitter,  label: 'Twitter',  hoverColor: '#1DA1F2' },
@@ -113,15 +114,33 @@ function TeamCard({ member, i }) {
 export default function Team() {
   const [data, setData] = useState(DEFAULT_TEAM);
 
+  // Normalize fallback data to match component expectations
+  const normalizedFallback = fallbackTeam.map((m, i) => ({
+    id: `fallback-${i}`,
+    name: m.name,
+    role: m.role,
+    image_url: m.image, // Map 'image' from siteData to 'image_url'
+    color: m.color,
+    twitter_url: m.social?.twitter || '#',
+    linkedin_url: m.social?.linkedin || '#',
+    github_url: m.social?.github || '#'
+  }));
+
   useEffect(() => {
     async function fetchTeam() {
-      const { data: dbData, error } = await supabase
-        .from('team_members')
-        .select('*')
-        .order('created_at', { ascending: true });
-      
-      if (!error && dbData && dbData.length > 0) {
-        setData(dbData);
+      try {
+        const { data: dbData, error } = await supabase
+          .from('team_members')
+          .select('*')
+          .order('created_at', { ascending: true });
+        
+        if (error || !dbData || dbData.length === 0) {
+          setData(normalizedFallback);
+        } else {
+          setData(dbData);
+        }
+      } catch (err) {
+        setData(normalizedFallback);
       }
     }
     fetchTeam();
