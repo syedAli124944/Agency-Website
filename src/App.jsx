@@ -27,6 +27,7 @@ import BookingPage from '@/pages/BookingPage';
 import BlogPostPage from '@/pages/BlogPostPage';
 import SuccessPage from '@/pages/SuccessPage';
 import AdminDashboard from '@/pages/AdminDashboard';
+import CheckoutPage from '@/pages/CheckoutPage';
 
 const pageVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -43,6 +44,7 @@ export default function App() {
   const [user, setUser]                   = useState(null);
   const [showSuccess, setShowSuccess]     = useState(false);
   const [showAdmin, setShowAdmin]         = useState(false);
+  const [checkoutData, setCheckoutData]   = useState(null);
 
   useEffect(() => {
     // Check for success URL from Stripe
@@ -102,6 +104,14 @@ export default function App() {
       <AnimatePresence>
         {showAuth && <AuthPage key="auth" onClose={() => setShowAuth(false)} />}
         {showAdmin && <AdminDashboard key="admin" onBack={() => setShowAdmin(false)} />}
+        {checkoutData && (
+          <CheckoutPage 
+            key="checkout"
+            plan={checkoutData.plan} 
+            interval={checkoutData.interval} 
+            onBack={() => setCheckoutData(null)} 
+          />
+        )}
       </AnimatePresence>
 
       {loaded && (
@@ -161,7 +171,9 @@ export default function App() {
                   <Portfolio onViewAll={handleViewAll} />
                   <Testimonials />
                   <Team />
-                  <Pricing />
+                  <Pricing 
+                  onCheckout={(plan, interval) => setCheckoutData({ plan, interval })}
+                />
                   <Blog onPostClick={(p) => {
                     if (window.__lenis) window.__lenis.scrollTo(0, { immediate: true });
                     window.scrollTo(0, 0);
