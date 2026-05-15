@@ -237,8 +237,8 @@ export const blogPosts = [
     date: 'May 15, 2026',
     readTime: '5 min read',
     gradient: 'from-cyan-500/20 to-blue-500/20',
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&auto=format&fit=crop',
-    cover: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&auto=format&fit=crop',
+    image: '/images/blog-1.png',
+    cover: '/images/blog-1.png',
     author: { name: 'Agency Team', role: 'Expert Contributor', avatar: 'https://ui-avatars.com/api/?name=Agency+Team&background=00F5FF&color=050510' },
     tags: ['Agency', 'AI', 'Strategy'],
     content: [
