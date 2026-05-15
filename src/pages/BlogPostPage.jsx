@@ -290,17 +290,6 @@ export default function BlogPostPage({ post: initialPost, onBack, onNavigate, on
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen bg-[#050508]">
       
-      {/* Sticky Return to Insights Button */}
-      <div className="fixed top-10 left-10 z-[100] pointer-events-none">
-        <button 
-          onClick={onBack}
-          className="pointer-events-auto flex items-center gap-3 px-8 py-4 rounded-2xl bg-[#050508]/40 border border-white/10 text-white font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-white/10 hover:border-white/40 transition-all shadow-2xl backdrop-blur-xl group"
-        >
-          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform text-accent-cyan" /> 
-          <span>Return to Insights</span>
-        </button>
-      </div>
-      
       {/* Reading Progress */}
       <motion.div className="fixed top-0 left-0 h-1.5 z-[100] bg-accent-cyan origin-left shadow-[0_0_10px_#00F5FF]" style={{ width: progressWidth }} />
 

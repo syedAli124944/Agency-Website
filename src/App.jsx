@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import SmoothScroll from '@/components/layout/SmoothScroll';
 import Preloader from '@/components/layout/Preloader';
@@ -181,6 +182,27 @@ export default function App() {
           )}
         </AnimatePresence>
       )}
+
+      {/* Fixed Global Elements */}
+      <AnimatePresence>
+        {currentPost && (
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="fixed top-10 left-10 z-[200] pointer-events-none"
+          >
+            <button 
+              onClick={() => setCurrentPost(null)}
+              className="pointer-events-auto flex items-center gap-3 px-8 py-4 rounded-2xl bg-[#050508]/60 border border-white/10 text-white font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-white/10 hover:border-white/40 transition-all shadow-2xl backdrop-blur-xl group"
+            >
+              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform text-accent-cyan" /> 
+              <span>Return to Insights</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {checkoutData && (
           <CheckoutPage 
