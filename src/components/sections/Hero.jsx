@@ -37,7 +37,7 @@ function ShowreelModal({ open, onClose }) {
             <div className="relative aspect-video bg-primary-900">
               <iframe
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0&modestbranding=1"
+                src="https://www.youtube.com/embed/GGf1JjSAKP4?autoplay=1&rel=0&modestbranding=1"
                 title="NovaSpark Agency Showreel"
                 allow="autoplay; fullscreen"
                 allowFullScreen
