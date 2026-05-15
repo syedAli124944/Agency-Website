@@ -19,10 +19,18 @@ To change the email from `syedali.as888@gmail.com` to your new agency email:
   - Go to [Google Cloud Console](https://console.cloud.google.com/) -> **APIs & Services** -> **OAuth Consent Screen**.
   - Go to [Github Developer Settings](https://github.com/settings/developers) -> **OAuth Apps**.
 
-## 2. 🏛️ Adding Bank Details (HBL)
-To update the bank details shown to clients:
-- Open `src/components/sections/Pricing.jsx`.
-- Look for the `BANK_DETAILS` constant (I am adding this now).
+## 2. 🏛️ Adding & Updating Bank Details (HBL)
+To update the bank details shown in the secure Checkout Portal:
+1. **File Location**: `src/pages/CheckoutPage.jsx`
+2. **Code Block**: Locate the `BANK_DETAILS` constant at the top of the file.
+3. **Fields**: Update the following strings:
+   - `accountTitle`: Your name or agency name.
+   - `accountNumber`: Your HBL account number.
+   - `iban`: Your international bank account number.
+   - `bankName`: Habib Bank Limited (HBL).
+   - `swift`: Your bank's SWIFT/BIC code.
+
+*Every payment now generates a unique **Transaction ID** (e.g., TXN-XXXX) so you can track every payment in your records.*
 
 ## 3. 🖼️ Updating Team & Portfolio
 - **Team Images**:
