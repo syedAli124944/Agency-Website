@@ -4,6 +4,7 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import SectionHeading from '@/components/common/SectionHeading';
 import { Globe, Smartphone, Palette, TrendingUp, Search, Cloud, Code2, Rocket, Zap } from 'lucide-react';
 import { fadeUp, staggerContainer } from '@/lib/utils';
+import { services as fallbackServices } from '@/data/siteData';
 
 // Helper to map icon names from DB to Lucide components
 const IconMap = {
@@ -69,15 +70,29 @@ function ServiceCard({ service, index }) {
 export default function Services() {
   const [data, setData] = useState([]);
 
+  // Normalize fallback data to match component expectations
+  // We use the icon object name directly from siteData as icon_name
+  const normalizedFallback = fallbackServices.map((s, i) => ({
+    ...s,
+    id: `fallback-${i}`,
+    icon_name: s.icon?.displayName || s.icon?.name || s.title.split(' ').join('') 
+  }));
+
   useEffect(() => {
     async function fetchServices() {
-      const { data: dbData, error } = await supabase
-        .from('services')
-        .select('*')
-        .order('created_at', { ascending: true });
-      
-      if (!error && dbData) {
-        setData(dbData);
+      try {
+        const { data: dbData, error } = await supabase
+          .from('services')
+          .select('*')
+          .order('created_at', { ascending: true });
+        
+        if (error || !dbData || dbData.length === 0) {
+          setData(normalizedFallback);
+        } else {
+          setData(dbData);
+        }
+      } catch (err) {
+        setData(normalizedFallback);
       }
     }
     fetchServices();
