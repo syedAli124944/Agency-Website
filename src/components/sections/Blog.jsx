@@ -4,6 +4,7 @@ import { ArrowUpRight, Clock, Loader2 } from 'lucide-react';
 import SectionHeading from '@/components/common/SectionHeading';
 import { fadeUp, staggerContainer } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import { blogPosts as fallbackPosts } from '@/data/siteData';
 
 function BlogCard({ post, i, onClick }) {
   const [imgErr, setImgErr] = useState(false);
@@ -78,6 +79,16 @@ export default function Blog({ onPostClick }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Normalize fallback data to match Supabase schema
+  const normalizedFallback = fallbackPosts.map(p => ({
+    ...p,
+    image_url: p.image,
+    author_name: p.author?.name,
+    author_avatar: p.author?.avatar,
+    read_time: p.readTime,
+    created_at: p.date || new Date().toISOString()
+  }));
+
   useEffect(() => {
     async function fetchPosts() {
       try {
@@ -87,9 +98,12 @@ export default function Blog({ onPostClick }) {
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setPosts(data || []);
+        
+        // If no data in Supabase, use fallback
+        setPosts(data && data.length > 0 ? data : normalizedFallback);
       } catch (err) {
         console.error('Error fetching blog posts:', err);
+        setPosts(normalizedFallback);
       } finally {
         setLoading(false);
       }
