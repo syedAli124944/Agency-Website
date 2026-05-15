@@ -12,4 +12,15 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-animations': ['framer-motion', 'gsap'],
+          'vendor-icons': ['lucide-react'],
+        },
+      },
+    },
+  },
 });
