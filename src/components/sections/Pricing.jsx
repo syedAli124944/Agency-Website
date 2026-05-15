@@ -244,9 +244,10 @@ export default function Pricing() {
 
                 <button 
                   onClick={() => openBankTransfer(plan)}
-                  className="w-full py-3.5 px-6 rounded-2xl border border-primary-800 text-primary-400 text-xs font-semibold hover:bg-primary-800/50 hover:text-white transition-all flex items-center justify-center gap-2 group"
+                  className="w-full py-3.5 px-6 rounded-2xl border border-white/10 bg-white/5 text-white/70 text-xs font-bold hover:bg-white/10 hover:text-white hover:border-white/20 transition-all flex items-center justify-center gap-2 group"
                 >
-                  <Landmark size={14} className="group-hover:scale-110 transition-transform" /> Pay via Bank Transfer
+                  <Landmark size={14} className="text-accent-cyan group-hover:scale-110 transition-transform" /> 
+                  <span>Pay via Bank Transfer</span>
                 </button>
               </div>
             </motion.div>
